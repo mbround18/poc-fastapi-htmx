@@ -6,8 +6,6 @@ from starlette.requests import Request
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
 
 class ConnectionManager:
     def __init__(self):
@@ -44,8 +42,21 @@ async def websocket_endpoint(websocket: WebSocket, username: str):
     try:
         while True:
             data = await websocket.receive_text()
-            await manager.broadcast(f"{username}: {data}")
+            # Create a styled HTML message
+            decorated_message = f"""
+            <div class="p-2 bg-gray-100 rounded-lg shadow-sm my-2">
+                <span class="font-bold text-blue-600">{username}</span>: 
+                <span class="text-gray-800">{data}</span>
+            </div>
+            """
+            await manager.broadcast(decorated_message)
     except WebSocketDisconnect:
         username = manager.disconnect(websocket)
         if username:
-            await manager.broadcast(f"{username} left the chat")
+            # Styled disconnect message
+            decorated_disconnect_message = f"""
+            <div class="p-2 bg-red-100 rounded-lg shadow-sm my-2">
+                <span class="text-red-600 font-semibold">{username} left the chat</span>
+            </div>
+            """
+            await manager.broadcast(decorated_disconnect_message)

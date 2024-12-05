@@ -67,7 +67,7 @@
             ws.onmessage = function (event) {
               const messages = document.getElementById("messages");
               const message = document.createElement("div");
-              message.textContent = event.data;
+              message.innerHTML = event.data;
               messages.appendChild(message);
               messages.scrollTop = messages.scrollHeight;
             };
